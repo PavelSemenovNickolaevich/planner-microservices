@@ -3,11 +3,13 @@ package ru.javabegin.micro.planner.users.users.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import ru.javabegin.micro.planner.entity.Task;
 import ru.javabegin.micro.planner.entity.User;
 import ru.javabegin.micro.planner.users.users.repo.UserRepository;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.Optional;
 
 // всегда нужно создавать отдельный класс Service для доступа к данным, даже если кажется,
 // что мало методов или это все можно реализовать сразу в контроллере
@@ -27,7 +29,7 @@ public class UserService {
 
     // возвращает только либо 0 либо 1 объект, т.к. email уникален для каждого пользователя
     public User findByEmail(String email) {
-        return repository.findByEmail(email);
+        return repository.findFirstByEmail(email);
     }
 
     public User add(User user) {
@@ -46,9 +48,10 @@ public class UserService {
         repository.deleteByEmail(email);
     }
 
-    public User findById(Long id) {
-        return repository.findById(id).get(); // т.к. возвращается Optional - можно получить объект методом get()
+    public Optional<User> findById(Long id) {
+        return repository.findById(id); // т.к. возвращается Optional - можно получить объект методом get()
     }
+
 
     public Page<User> findByParams(String username, String password, PageRequest paging) {
         return repository.findByParams(username, password, paging);

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.Task;
 import ru.javabegin.micro.planner.todo.search.TaskSearchValues;
 import ru.javabegin.micro.planner.todo.service.TaskService;
+import ru.javabegin.micro.planner.utils.rest.resttemplate.UserRestBuilder;
 
 import java.text.ParseException;
 import java.util.Calendar;
@@ -39,11 +40,14 @@ public class TaskController {
     public static final String ID_COLUMN = "id"; // имя столбца id
     private final TaskService taskService; // сервис для доступа к данным (напрямую к репозиториям не обращаемся)
 
+    // микросервисы для работы с пользователями
+    private UserRestBuilder userRestBuilder;
 
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskService taskService, UserRestBuilder userRestBuilder) {
         this.taskService = taskService;
+        this.userRestBuilder = userRestBuilder;
     }
 
 
@@ -68,7 +72,13 @@ public class TaskController {
             return new ResponseEntity("missed param: title", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        return ResponseEntity.ok(taskService.add(task)); // возвращаем созданный объект со сгенерированным id
+        // если такой пользователь существует
+        if (userRestBuilder.userExists(task.getUserId())) { // вызываем микросервис из другого модуля
+            return ResponseEntity.ok(taskService.add(task)); // возвращаем добавленный объект с заполненным ID
+        }
+
+        // если пользователя НЕ существует
+        return new ResponseEntity("user id=" + task.getUserId() + " not found", HttpStatus.NOT_ACCEPTABLE);
 
     }
 
@@ -82,7 +92,7 @@ public class TaskController {
             return new ResponseEntity("missed param: id", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        // если передали пустое значение title
+        // если передали пустое значение
         if (task.getTitle() == null || task.getTitle().trim().length() == 0) {
             return new ResponseEntity("missed param: title", HttpStatus.NOT_ACCEPTABLE);
         }
@@ -135,7 +145,10 @@ public class TaskController {
     @PostMapping("/search")
     public ResponseEntity<Page<Task>> search(@RequestBody TaskSearchValues taskSearchValues) throws ParseException {
 
-        // исключить NullPointerException
+        // все заполненные условия проверяются одновременно (т.е. И, а не ИЛИ)
+        // это можно изменять в запросе репозитория
+
+        // можно передавать не полный title, а любой текст для поиска
         String title = taskSearchValues.getTitle() != null ? taskSearchValues.getTitle() : null;
 
         // конвертируем Boolean в Integer

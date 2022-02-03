@@ -16,8 +16,7 @@ import java.util.Date;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    // возвращает только либо 0 либо 1 объект, т.к. email уникален для каждого пользователя
-    User findByEmail(String email); // email уникально для всей таблицы
+    User findFirstByEmail(String email);
 
     void deleteByEmail(String email); // строгое соотвествие email (не вхождени)
 

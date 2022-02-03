@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.Priority;
 import ru.javabegin.micro.planner.todo.search.PrioritySearchValues;
 import ru.javabegin.micro.planner.todo.service.PriorityService;
+import ru.javabegin.micro.planner.utils.rest.resttemplate.UserRestBuilder;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -29,20 +30,19 @@ import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/priority") // базовый URI
-
-/*
-В контроллере можно задать свои настройки CORS, отличные от глобальных (из класса SpringConfig)
-@CrossOrigin(origins = "https://localhost:4200", allowCredentials = "true")
- */
 public class PriorityController {
 
     // доступ к данным из БД
     private PriorityService priorityService;
 
-    // автоматическое внедрение экземпляра класса через конструктор
+    // микросервисы для работы с пользователями
+    private UserRestBuilder userRestBuilder;
+
+    // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public PriorityController(PriorityService priorityService) {
+    public PriorityController(PriorityService priorityService, UserRestBuilder userRestBuilder) {
         this.priorityService = priorityService;
+        this.userRestBuilder = userRestBuilder;
     }
 
 
@@ -71,8 +71,14 @@ public class PriorityController {
             return new ResponseEntity("missed param: color", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        // save работает как на добавление, так и на обновление
-        return ResponseEntity.ok(priorityService.add(priority));
+        // если такой пользователь существует
+        if (userRestBuilder.userExists(priority.getUserId())) { // вызываем микросервис из другого модуля
+            return ResponseEntity.ok(priorityService.add(priority)); // возвращаем добавленный объект с заполненным ID
+        }
+
+        // если пользователя НЕ существует
+        return new ResponseEntity("user id=" + priority.getUserId() + " not found", HttpStatus.NOT_ACCEPTABLE);
+
     }
 
 

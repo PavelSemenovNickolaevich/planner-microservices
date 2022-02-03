@@ -23,12 +23,12 @@ import ru.javabegin.micro.planner.todo.service.StatService;
 */
 
 @RestController
-
+// базовый URI не нужен, т.к. метод только один
 public class StatController {
 
     private final StatService statService; // сервис для доступа к данным (напрямую к репозиториям не обращаемся)
 
-    // автоматическое внедрение экземпляра класса через конструктор
+    // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
     public StatController(StatService statService) {
         this.statService = statService;

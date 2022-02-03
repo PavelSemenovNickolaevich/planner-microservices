@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.User;
 import ru.javabegin.micro.planner.users.users.search.UserSearchValues;
 import ru.javabegin.micro.planner.users.users.service.UserService;
+import ru.javabegin.micro.planner.utils.rest.webclient.UserWebClientBuilder;
 
 import java.text.ParseException;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 
 /*
@@ -36,11 +38,15 @@ public class UserController {
     public static final String ID_COLUMN = "id"; // имя столбца id
     private final UserService userService; // сервис для доступа к данным (напрямую к репозиториям не обращаемся)
 
+    // микросервисы для работы с пользователями
+    private UserWebClientBuilder userWebClientBuilder;
 
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserWebClientBuilder userWebClientBuilder) {
         this.userService = userService;
+        this.userWebClientBuilder = userWebClientBuilder;
+
     }
 
 
@@ -67,7 +73,18 @@ public class UserController {
             return new ResponseEntity("missed param: username", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        return ResponseEntity.ok(userService.add(user)); // возвращаем созданный объект со сгенерированным id
+        // добавляем пользователя
+        user = userService.add(user);
+
+        if (user != null) {
+            // заполняем начальные данные пользователя (в параллелном потоке)
+            userWebClientBuilder.initUserData(user.getId()).subscribe(result -> {
+                        System.out.println("user populated: " + result);
+                    }
+            );
+        }
+
+        return ResponseEntity.ok(user); // возвращаем созданный объект со сгенерированным id
 
     }
 
@@ -138,25 +155,28 @@ public class UserController {
     @PostMapping("/id")
     public ResponseEntity<User> findById(@RequestBody Long id) {
 
-        User user = null;
+        Optional<User> userOptional = userService.findById(id);
 
         // можно обойтись и без try-catch, тогда будет возвращаться полная ошибка (stacktrace)
         // здесь показан пример, как можно обрабатывать исключение и отправлять свой текст/статус
         try {
-            user = userService.findById(id);
+            if (userOptional.isPresent()) { // если объект найден
+                return ResponseEntity.ok(userOptional.get()); // получаем User из контейнера и возвращаем в теле ответа
+            }
         } catch (NoSuchElementException e) { // если объект не будет найден
             e.printStackTrace();
-            return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        return ResponseEntity.ok(user);
+        // пользователь с таким id не найден
+        return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
+
     }
 
     // получение уникального объекта по email
     @PostMapping("/email")
     public ResponseEntity<User> findByEmail(@RequestBody String email) { // строго соответствие email
 
-        User user = null;
+        User user;
 
         // можно обойтись и без try-catch, тогда будет возвращаться полная ошибка (stacktrace)
         // здесь показан пример, как можно обрабатывать исключение и отправлять свой текст/статус
