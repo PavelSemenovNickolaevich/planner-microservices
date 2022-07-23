@@ -35,10 +35,12 @@ public class Category implements Serializable {
 
     private String title;
 
-    @Column(name = "completed_count", updatable = false) // т.к. это поле высчитывается автоматически в триггерах - вручную его не обновляем (updatable = false)
+    @Column(name = "completed_count", updatable = false)
+    // т.к. это поле высчитывается автоматически в триггерах - вручную его не обновляем (updatable = false)
     private Long completedCount;
 
-    @Column(name = "uncompleted_count", updatable = false) // т.к. это поле высчитывается автоматически в триггерах - вручную его не обновляем (updatable = false)
+    @Column(name = "uncompleted_count", updatable = false)
+    // т.к. это поле высчитывается автоматически в триггерах - вручную его не обновляем (updatable = false)
     private Long uncompletedCount;
 
 //    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -46,7 +48,7 @@ public class Category implements Serializable {
 //    @JoinColumn(name = "user_id", referencedColumnName = "id") // по каким полям связаны эти 2 объекта (foreign key)
 //    private User user;
 
-    @Column(name="user_id")
+    @Column(name = "user_id")
     private Long userId;
 
     @Override

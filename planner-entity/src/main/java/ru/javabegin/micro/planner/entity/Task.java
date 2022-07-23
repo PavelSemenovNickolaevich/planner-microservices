@@ -1,7 +1,6 @@
 package ru.javabegin.micro.planner.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +19,7 @@ import java.util.Objects;
  */
 
 @Entity
-@Table(name = "task", schema = "todo", catalog = "planner_todo")
+@Table(name = "task", schema = "todo", catalog = "planner_user")
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
@@ -51,13 +50,12 @@ public class Task implements Serializable {
     @JoinColumn(name = "category_id", referencedColumnName = "id") // по каким полям связывать (foreign key)
     private Category category;
 
-
 //    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "user_id", referencedColumnName = "id") // по каким полям связывать (foreign key)
 //    private User user; // для какого пользователя задача
 
-    @Column(name="user_id")
+    @Column(name = "user_id")
     private Long userId;
 
     @Override

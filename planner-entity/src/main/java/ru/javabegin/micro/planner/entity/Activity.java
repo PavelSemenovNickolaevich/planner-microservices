@@ -40,7 +40,7 @@ public class Activity { // название таблицы будет брать
 //    @JoinColumn(name = "user_id", referencedColumnName = "id")
 //    private User user;
 
-    @Column(name="user_id")
+    @Column(name = "user_id")
     private Long userId;
 
 
