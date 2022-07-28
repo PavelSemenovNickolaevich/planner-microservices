@@ -85,18 +85,13 @@ public class CategoryController {
 
         // вызов мс через feign интерфейс
 
+        ResponseEntity<User> result = userFeignClient.findUserById(category.getUserId());
 
-        ResponseEntity<User> result =  userFeignClient.findUserById(category.getUserId());
-
-        if (result == null){ // если мс недоступен - вернется null
+        if (result == null) { // если мс недоступен - вернется null
             return new ResponseEntity("система пользователей недоступна, попробуйте позже", HttpStatus.NOT_FOUND);
         }
 
-        if (result.getBody() != null){ // если пользователь не пустой
-            return ResponseEntity.ok(categoryService.add(category));
-        }
-
-        if (userFeignClient.findUserById(category.getUserId()) != null){
+        if (result.getBody() != null) { // если пользователь не пустой
             return ResponseEntity.ok(categoryService.add(category));
         }
 
@@ -104,7 +99,6 @@ public class CategoryController {
         return new ResponseEntity("user id=" + category.getUserId() + " not found", HttpStatus.NOT_ACCEPTABLE);
 
     }
-
 
     @PutMapping("/update")
     public ResponseEntity update(@RequestBody Category category) {

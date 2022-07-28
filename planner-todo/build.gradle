@@ -30,7 +30,8 @@ dependencies {
     // обязательно должна быть именно библиотека с netflix в названии (иначе проект может не запуститься)
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-hystrix:+'
 
-    implementation 'org.springframework.boot:spring-cloud-starter-stream-rabbit:+'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.cloud:spring-cloud-starter-stream-rabbit:+'
 
     // драйвер БД
     runtimeOnly 'org.postgresql:postgresql'
