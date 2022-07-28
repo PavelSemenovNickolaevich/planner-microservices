@@ -27,6 +27,11 @@ dependencies {
     implementation 'ru.javabegin.micro.planner:planner-entity'
     implementation 'ru.javabegin.micro.planner:planner-utils'
 
+    // обязательно должна быть именно библиотека с netflix в названии (иначе проект может не запуститься)
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-hystrix:+'
+
+    implementation 'org.springframework.boot:spring-cloud-starter-stream-rabbit:+'
+
     // драйвер БД
     runtimeOnly 'org.postgresql:postgresql'
 

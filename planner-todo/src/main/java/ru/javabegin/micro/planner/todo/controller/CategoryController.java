@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.Category;
+import ru.javabegin.micro.planner.entity.User;
 import ru.javabegin.micro.planner.todo.feign.UserFeignClient;
 import ru.javabegin.micro.planner.todo.search.CategorySearchValues;
 import ru.javabegin.micro.planner.todo.service.CategoryService;
@@ -83,6 +84,18 @@ public class CategoryController {
 //        userWebClientBuilder.userExistsAsync(category.getUserId()).subscribe(user -> System.out.println("user = " + user));
 
         // вызов мс через feign интерфейс
+
+
+        ResponseEntity<User> result =  userFeignClient.findUserById(category.getUserId());
+
+        if (result == null){ // если мс недоступен - вернется null
+            return new ResponseEntity("система пользователей недоступна, попробуйте позже", HttpStatus.NOT_FOUND);
+        }
+
+        if (result.getBody() != null){ // если пользователь не пустой
+            return ResponseEntity.ok(categoryService.add(category));
+        }
+
         if (userFeignClient.findUserById(category.getUserId()) != null){
             return ResponseEntity.ok(categoryService.add(category));
         }
