@@ -2,11 +2,11 @@ plugins {
     id 'org.springframework.boot' version '2.6.3'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
-    id 'org.jetbrains.kotlin.jvm' version '1.7.10'
+    id 'org.jetbrains.kotlin.jvm' version '1.5.10'
 
-    id "org.jetbrains.kotlin.plugin.spring" version "1.7.10" // для корректного создания spring бинов из котлин классов
-    id "org.jetbrains.kotlin.plugin.jpa" version "1.7.10" // для корректной работы hibernate/jpa с kotlin
-    id "org.jetbrains.kotlin.plugin.allopen" version "1.7.10" // делает все классы kotlin open, а не final
+    id "org.jetbrains.kotlin.plugin.spring" version "1.5.10" // для корректного создания spring бинов из котлин классов
+    id "org.jetbrains.kotlin.plugin.jpa" version "1.5.10" // для корректной работы hibernate/jpa с kotlin
+    id "org.jetbrains.kotlin.plugin.allopen" version "1.5.10" // делает все классы kotlin open, а не final
 }
 
 group = 'ru.javabegin.micro.planner'
