@@ -24,7 +24,7 @@ public class TestDataService {
         this.categoryService = categoryService;
     }
 
-    public void initTestData(Long userId){
+    public void initTestData(String userId){
         Priority prior1 = new Priority();
         prior1.setColor("#fff");
         prior1.setTitle("Важный");

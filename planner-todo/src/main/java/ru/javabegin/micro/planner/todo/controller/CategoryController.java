@@ -3,6 +3,8 @@ package ru.javabegin.micro.planner.todo.controller;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.Category;
 import ru.javabegin.micro.planner.entity.User;
@@ -42,11 +44,11 @@ public class CategoryController {
 
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public CategoryController(CategoryService categoryService, UserFeignClient userFeignClient, UserRestBuilder userRestBuilder, UserWebClientBuilder userWebClientBuilder) {
+    public CategoryController(CategoryService categoryService, UserRestBuilder userRestBuilder, UserWebClientBuilder userWebClientBuilder) {
         this.categoryService = categoryService;
         this.userRestBuilder = userRestBuilder;
         this.userWebClientBuilder = userWebClientBuilder;
-        this.userFeignClient = userFeignClient;
+
     }
 
     @PostMapping("/all")
@@ -56,12 +58,14 @@ public class CategoryController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<Category> add(@RequestBody Category category) {
+    public ResponseEntity<Category> add(@RequestBody Category category, @AuthenticationPrincipal Jwt jwt) {
+
+        category.setUserId(jwt.getSubject()); //UUID пользователя из keycloak
 
         // проверка на обязательные параметры
         if (category.getId() != null && category.getId() != 0) { // это означает, что id заполнено
             // id создается автоматически в БД (autoincrement), поэтому его передавать не нужно, иначе может быть конфликт уникальности значения
-            return new ResponseEntity("redundant param: id MUST be null", HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity("redundant param: category id MUST be null", HttpStatus.NOT_ACCEPTABLE);
         }
 
         // если передали пустое значение title
@@ -85,13 +89,17 @@ public class CategoryController {
 
         // вызов мс через feign интерфейс
 
-        ResponseEntity<User> result = userFeignClient.findUserById(category.getUserId());
+//        ResponseEntity<User> result = userFeignClient.findUserById(category.getUserId());
+//
+//        if (result == null) { // если мс недоступен - вернется null
+//            return new ResponseEntity("система пользователей недоступна, попробуйте позже", HttpStatus.NOT_FOUND);
+//        }
+//
+//        if (result.getBody() != null) { // если пользователь не пустой
+//            return ResponseEntity.ok(categoryService.add(category));
+//        }
 
-        if (result == null) { // если мс недоступен - вернется null
-            return new ResponseEntity("система пользователей недоступна, попробуйте позже", HttpStatus.NOT_FOUND);
-        }
-
-        if (result.getBody() != null) { // если пользователь не пустой
+        if (!category.getUserId().isBlank()) {
             return ResponseEntity.ok(categoryService.add(category));
         }
 

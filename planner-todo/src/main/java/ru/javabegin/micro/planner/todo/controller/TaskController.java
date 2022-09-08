@@ -6,6 +6,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.Task;
 import ru.javabegin.micro.planner.todo.search.TaskSearchValues;
@@ -59,7 +61,9 @@ public class TaskController {
 
     // добавление
     @PostMapping("/add")
-    public ResponseEntity<Task> add(@RequestBody Task task) {
+    public ResponseEntity<Task> add(@RequestBody Task task, @AuthenticationPrincipal Jwt jwt) {
+
+        task.setUserId(jwt.getSubject()); //UUID пользователя из keycloak
 
         // проверка на обязательные параметры
         if (task.getId() != null && task.getId() != 0) {
@@ -73,7 +77,12 @@ public class TaskController {
         }
 
         // если такой пользователь существует
-        if (userRestBuilder.userExists(task.getUserId())) { // вызываем микросервис из другого модуля
+//        if (userRestBuilder.userExists(task.getUserId())) { // вызываем микросервис из другого модуля
+//            return ResponseEntity.ok(taskService.add(task)); // возвращаем добавленный объект с заполненным ID
+//        }
+
+        // если UUID суц польщователя
+        if (!task.getUserId().isBlank()) { // вызываем микросервис из другого модуля
             return ResponseEntity.ok(taskService.add(task)); // возвращаем добавленный объект с заполненным ID
         }
 

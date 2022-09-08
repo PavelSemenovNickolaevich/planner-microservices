@@ -17,7 +17,7 @@ public class MessageConsumer {
 
     // метод вызывается автометически как только появляется сообщение в канале
     @StreamListener(target = TodoBinding.INPUT_CHANNEL)
-    public void initTestData(Long userId) {
+    public void initTestData(String userId) {
         testDataService.initTestData(userId);
     }
 }

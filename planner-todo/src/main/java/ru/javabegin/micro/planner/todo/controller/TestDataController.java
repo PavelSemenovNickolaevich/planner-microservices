@@ -36,7 +36,7 @@ public class TestDataController {
     }
 
     @PostMapping("/init")
-    public ResponseEntity<Boolean> init(@RequestBody Long userId) {
+    public ResponseEntity<Boolean> init(@RequestBody String userId) {
 
         Priority prior1 = new Priority();
         prior1.setColor("#fff");
