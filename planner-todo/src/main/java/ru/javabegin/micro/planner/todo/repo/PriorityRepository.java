@@ -19,9 +19,9 @@ public interface PriorityRepository extends JpaRepository<Priority, Long> {
     @Query("SELECT p FROM Priority p where " +
             "(:title is null or :title='' " + // если передадим параметр title пустым, то выберутся все записи (сработает именно это условие)
             " or lower(p.title) like lower(concat('%', :title,'%'))) " + // если параметр title не пустой, то выполнится уже это условие
-            " and p.userId=:id " + // фильтрация для конкретного пользователя
+            " and p.userId=:userId " + // фильтрация для конкретного пользователя
             "order by p.title asc")
     // сортировка по названию
-    List<Priority> findByTitle(@Param("title") String title, @Param("id") Long id);
+    List<Priority> findByTitle(@Param("title") String title, @Param("userId") String id);
 
 }

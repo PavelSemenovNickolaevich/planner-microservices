@@ -156,10 +156,12 @@ public class PriorityController {
 
     // поиск по любым параметрам PrioritySearchValues
     @PostMapping("/search")
-    public ResponseEntity<List<Priority>> search(@RequestBody PrioritySearchValues prioritySearchValues) {
+    public ResponseEntity<List<Priority>> search(@RequestBody PrioritySearchValues prioritySearchValues, @AuthenticationPrincipal Jwt jwt ) {
 
+        prioritySearchValues.setUserId(jwt.getSubject());
         // проверка на обязательные параметры
-        if (prioritySearchValues.getUserId() == null || prioritySearchValues.getUserId() == 0) {
+
+        if (prioritySearchValues.getUserId().isBlank()) {
             return new ResponseEntity("missed param: user id", HttpStatus.NOT_ACCEPTABLE);
         }
 

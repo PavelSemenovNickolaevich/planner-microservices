@@ -44,7 +44,7 @@ public class TaskService {
     }
 
 
-    public Page<Task> findByParams(String text, Boolean completed, Long priorityId, Long categoryId, Long userId, Date dateFrom, Date dateTo, PageRequest paging) {
+    public Page<Task> findByParams(String text, Boolean completed, Long priorityId, Long categoryId, String userId, Date dateFrom, Date dateTo, PageRequest paging) {
         return repository.findByParams(text, completed, priorityId, categoryId, userId, dateFrom, dateTo, paging);
     }
 

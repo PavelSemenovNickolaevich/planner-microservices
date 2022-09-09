@@ -148,10 +148,12 @@ public class CategoryController {
 
     // поиск по любым параметрам CategorySearchValues
     @PostMapping("/search")
-    public ResponseEntity<List<Category>> search(@RequestBody CategorySearchValues categorySearchValues) {
+    public ResponseEntity<List<Category>> search(@RequestBody CategorySearchValues categorySearchValues, @AuthenticationPrincipal Jwt jwt) {
+
+        categorySearchValues.setUserId(jwt.getSubject());
 
         // проверка на обязательные параметры
-        if (categorySearchValues.getUserId() == null || categorySearchValues.getUserId() == 0) {
+        if (categorySearchValues.getUserId().isBlank()) {
             return new ResponseEntity("missed param: user id", HttpStatus.NOT_ACCEPTABLE);
         }
 

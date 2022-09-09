@@ -40,7 +40,7 @@ public class CategoryService {
         repository.deleteById(id);
     }
 
-    public List<Category> findByTitle(String title, Long userId) {
+    public List<Category> findByTitle(String title, String userId) {
         return repository.findByTitle(title, userId);
     }
 }

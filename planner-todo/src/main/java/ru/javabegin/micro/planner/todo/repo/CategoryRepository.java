@@ -20,8 +20,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query("SELECT c FROM Category c where " +
             "(:title is null or :title='' " + // если передадим параметр title пустым, то выберутся все записи (сработает именно это условие)
             " or lower(c.title) like lower(concat('%', :title,'%'))) " + // если параметр title не пустой, то выполнится уже это условие
-            " and c.userId=:id  " + // фильтрация для конкретного пользователя
+            " and c.userId=:userId  " + // фильтрация для конкретного пользователя
             " order by c.title asc")
     // сортировка по названию
-    List<Category> findByTitle(@Param("title") String title, @Param("id") Long id);
+    List<Category> findByTitle(@Param("title") String title, @Param("userId") String id);
 }
